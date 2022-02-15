@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="loadPersons()">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody id="personenBody">
+
+        </tbody>
+    </table>
+    <I>Vul hier je naam in:</I>
+    <input type="text" id="NieuweNaam" SIZE="20" MAXLENGTH="30">
+    <br>
+    <I>Vul hier je leeftijd in:</I>
+    <input type="number" id="NieuweAge" SIZE="20" MAXLENGTH="30">
+    
+    <br>
+    <I>ID(optioneel):</I>
+    <input type="number" id="ID" SIZE="20" MAXLENGTH="30">
+    <br>
+    <button type="button" onclick="createPerson()">Maak persoon</button>
+    <button type="button" onclick="removePerson()">Verwijder persoon</button>
+    <button type="button" onclick="changePerson()">Pas persoon aan</button>
+    <button type="button" onclick="loadPersonsNaam()">zoekmetnaam</button>
+
+
+    <script>
+        //fetch api
+        function loadPersons(){
+            fetch("http://localhost:8080/api/person/alle")
+                .then(response => response.json())
+                .then(personenLijst => {
+                    console.log('personenLijst', personenLijst);
+
+                    let personsTableHtml = "";
+
+                    // Loop to access all rows 
+                    for (let r of personenLijst) {
+                        personsTableHtml += `<tr> 
+                            <td>${r.id} </td>
+                            <td>${r.name}</td>
+                            <td>${r.age}</td>
+                        </tr>`;
+                    }
+
+                    // Setting innerHTML as tab variable
+                    document.getElementById("personenBody").innerHTML = personsTableHtml;
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    // handle the error
+                });
+        }
+    function createPerson() {
+    // Formulier uitlezen
+        let NameInvoer = document.getElementById('NieuweNaam').value;
+        let AgeInvoer = document.getElementById('NieuweAge').value;
+        document.getElementById('NieuweAge').value='';
+        document.getElementById('NieuweNaam').value='';
+        let newPerson = {
+            name: NameInvoer,
+            age: AgeInvoer
+        }
+
+        fetch("http://localhost:8080/api/person", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newPerson)
+        })
+        .then(response => {
+            alert('Is goedgegaan');
+            loadPersons();
+        })
+        .catch(error => {
+            alert('Er is iets fouts gegaan');
+        });
+}
+function removePerson() {
+    // Formulier uitlezen
+        let ID = document.getElementById('ID').value;
+        document.getElementById('ID').value='';
+        document.getElementById('NieuweAge').value='';
+        document.getElementById('NieuweNaam').value='';
+
+        fetch("http://localhost:8080/api/person/"+ID, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            alert('Is goedgegaan');
+            loadPersons();
+        })
+        .catch(error => {
+            alert('Er is iets fouts gegaan');
+        });
+}
+function changePerson() {
+    // Formulier uitlezen
+        let ID = document.getElementById('ID').value;
+        let NameInvoer = document.getElementById('NieuweNaam').value;
+        let AgeInvoer = document.getElementById('NieuweAge').value;
+        document.getElementById('ID').value='';
+        document.getElementById('NieuweAge').value='';
+        document.getElementById('NieuweNaam').value='';
+
+        let newPerson = {
+            name: NameInvoer,
+            age: AgeInvoer
+        }
+        fetch("http://localhost:8080/api/person/"+ID, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newPerson)
+        })
+        .then(response => {
+            alert('Is goedgegaan');
+            loadPersons();
+        })
+        .catch(error => {
+            alert('Er is iets fouts gegaan');
+        });
+}
+function loadPersonsNaam(){
+    let naam = document.getElementById('NieuweNaam').value;
+            fetch("http://localhost:8080/api/person/allenaam/"+naam)
+                .then(response => response.json())
+                .then(personenLijst => {
+                    console.log('personenLijst', personenLijst);
+
+                    let personsTableHtml = "";
+
+                    // Loop to access all rows 
+                    for (let r of personenLijst) {
+                        personsTableHtml += `<tr> 
+                            <td>${r.id} </td>
+                            <td>${r.name}</td>
+                            <td>${r.age}</td>
+                        </tr>`;
+                    }
+
+                    // Setting innerHTML as tab variable
+                    document.getElementById("personenBody").innerHTML = personsTableHtml;
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    // handle the error
+                });
+        }
+//veld bijplaatsen waarbij je id meegeeft
+//function aanmaken aanpassen
+//function aanmaken verwijderen
+//input type text id nieuwe naam
+//veld bijplaatsen voor id
+//button type button onclick="method">versturen<button>
+//<document  get elementbyid('nieuwe naam').value
+    </script>
+</body>
+</html>
